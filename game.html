@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>60 Seconds</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#090b18;color:#fff;min-height:100vh;overflow:hidden}
+button{font:inherit;border:0;cursor:pointer}
+#app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+.screen{width:min(980px,100%);min-height:min(760px,calc(100vh - 28px));border:1px solid #303657;border-radius:28px;background:linear-gradient(145deg,#171a31,#0d1020);box-shadow:0 25px 80px #0008;overflow:hidden;position:relative}
+.hidden{display:none!important}
+.home{padding:45px 25px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:100%}
+.logo{font-size:clamp(48px,9vw,88px);font-weight:950;letter-spacing:-5px;background:linear-gradient(90deg,#7c5cff,#2de2e6,#ffcf4a);-webkit-background-clip:text;color:transparent}
+.tag{font-size:clamp(17px,3vw,25px);color:#b8bedb;margin:8px 0 30px}
+.play{padding:17px 55px;border-radius:18px;background:linear-gradient(135deg,#7c5cff,#27d6e8);color:#fff;font-weight:900;font-size:22px;box-shadow:0 10px 30px #4f58ff55;transition:.18s}
+.play:hover{transform:translateY(-3px) scale(1.02)}
+.stats{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;justify-content:center}.stat{background:#ffffff0a;border:1px solid #ffffff12;padding:12px 20px;border-radius:15px;min-width:130px}.stat b{display:block;font-size:25px}.stat span{color:#8f96b8;font-size:12px;text-transform:uppercase}
+.help{margin-top:30px;color:#8f96b8;font-size:14px}.kbd{background:#ffffff12;padding:3px 7px;border-radius:6px}
+#game{padding:10px;display:flex;flex-direction:column;min-height:100%;height:100%}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:5px 5px 14px}
+.scorebox,.timerbox,.combo{background:#ffffff0a;border:1px solid #ffffff12;border-radius:15px;padding:9px 13px}.scorebox{text-align:left}.combo{text-align:right}
+.small{font-size:11px;color:#8f96b8;text-transform:uppercase;letter-spacing:1px}.big{font-size:23px;font-weight:900}.timerbox{text-align:center;min-width:100px}.timer{font-size:35px;font-weight:950;line-height:1}.danger{color:#ff657b!important;animation:pulse .5s infinite alternate}@keyframes pulse{to{transform:scale(1.08)}}
+.bar{height:6px;background:#ffffff0d;border-radius:10px;overflow:hidden;margin:0 5px 13px}.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#2de2e6,#7c5cff,#ffcf4a);transition:width .1s linear}
+.objective{background:linear-gradient(135deg,#211e48,#151c3b);border:1px solid #4a4d83;border-radius:20px;padding:17px;text-align:center;margin:0 5px 12px}.objective .label{color:#7eeaf0;font-size:11px;font-weight:900;letter-spacing:2px}.objective h2{margin:4px 0;font-size:clamp(22px,5vw,34px)}.objective p{margin:0;color:#adb4d2}
+#board{flex:1;min-height:0;height:100%;min-height:560px;border-radius:22px;background:#080b17;border:1px solid #242945;position:relative;overflow:hidden;padding:15px}
+.feedback{position:absolute;z-index:30;left:50%;top:48%;transform:translate(-50%,-50%);font-size:32px;font-weight:950;pointer-events:none;animation:pop .55s ease-out forwards}@keyframes pop{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-110%) scale(1.2)}}
+.targets{height:100%;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}.target{width:90px;height:90px;border-radius:22px;background:#fff;border:5px solid #fff3;box-shadow:0 8px 25px #0008;transition:.1s}.target:active{transform:scale(.9)}.green{background:#37e37d}.red{background:#ff536d}.blue{background:#42a5ff}.yellow{background:#ffd34d}.purple{background:#a86cff}
+.stars{position:relative;height:100%}.star{position:absolute;font-size:43px;filter:drop-shadow(0 4px 8px #000);animation:float 1.5s ease-in-out infinite alternate}.star:active{transform:scale(.7)}@keyframes float{to{transform:translateY(-8px) rotate(8deg)}}
+.blocks{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;max-width:450px;margin:auto}.block{aspect-ratio:1;border-radius:12px;background:linear-gradient(145deg,#7c5cff,#3b45bb);border:2px solid #a9a2ff66;box-shadow:inset 0 3px 8px #fff3}.block.on{background:linear-gradient(145deg,#38e3a1,#1ca97c);transform:scale(.95)}
+.toys{height:100%;position:relative}.toy{position:absolute;font-size:42px;padding:4px;background:#ffffff08;border-radius:15px}.toy:active{transform:scale(.7)}
+.memory{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:430px;margin:auto}.mem{aspect-ratio:1;border-radius:14px;background:#222946;border:2px solid #343d68;font-size:0}.mem.show{background:linear-gradient(135deg,#ffcf4a,#ff7d7d);font-size:25px}
+.tapzone{height:100%;display:flex;align-items:center;justify-content:center}.tapbtn{width:min(270px,65vw);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe27a,#ff8a4c 55%,#ff4e71);color:white;font-size:34px;font-weight:950;box-shadow:0 18px 50px #ff526855,inset 0 -10px 0 #d13d55}.tapbtn:active{transform:scale(.93)}
+.choice{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;height:100%}.choice button{padding:17px 22px;border-radius:15px;background:#202744;color:white;border:2px solid #343d68;font-weight:900}.choice button:hover{border-color:#7c5cff}
+.footer{font-size:12px;color:#666d8c;text-align:center;padding:9px}
+.overlay{position:absolute;inset:0;background:#070916ee;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}.modal{max-width:500px;text-align:center;background:#171b32;border:1px solid #3a416d;border-radius:25px;padding:30px;box-shadow:0 20px 70px #000}.modal h2{font-size:34px;margin:0 0 8px}.modal p{color:#aeb5d0;line-height:1.6}.modal button{margin-top:12px;padding:14px 30px;border-radius:14px;background:#7c5cff;color:white;font-weight:900}
+@media(max-width:600px){.screen{border-radius:20px;min-height:calc(100vh - 14px);height:calc(100vh - 14px)}#app{padding:7px}.top{grid-template-columns:1fr 1fr;padding-bottom:7px}.combo{display:none}.scorebox{text-align:center}.timerbox{grid-column:2}.objective{padding:10px;margin-bottom:8px}.objective h2{font-size:22px}.objective p{font-size:12px}#board{min-height:0;height:auto;flex:1}.blocks{grid-template-columns:repeat(5,1fr);gap:6px}.target{width:70px;height:70px}.star{font-size:36px}}
+
+/* ===== PINK RAINBOW FX ===== */
+body::before{
+ content:"";position:fixed;inset:-35%;z-index:-2;pointer-events:none;
+ background:conic-gradient(from 0deg,#ff4fa3,#ff7ac8,#ffd166,#8df5ff,#9d7cff,#ff4fa3);
+ filter:blur(70px);opacity:.20;animation:rainbowSpin 16s linear infinite;
+}
+body::after{
+ content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(circle at 15% 15%,#ff4fa333,transparent 25%),
+ radial-gradient(circle at 85% 75%,#b56cff33,transparent 28%);
+ animation:bgPulse 4s ease-in-out infinite alternate;
+}
+@keyframes rainbowSpin{to{transform:rotate(360deg)}}
+@keyframes bgPulse{from{opacity:.55}to{opacity:1}}
+.screen::before{
+ content:"";position:absolute;inset:0;pointer-events:none;border-radius:28px;
+ background:linear-gradient(120deg,transparent 20%,#ff7ac80c 40%,#fff7 50%,#9d7cff0d 60%,transparent 80%);
+ background-size:220% 100%;animation:shineSweep 6s linear infinite;
+}
+@keyframes shineSweep{to{background-position:-220% 0}}
+.logo{text-shadow:0 0 25px #ff55aa44;animation:logoGlow 2.5s ease-in-out infinite alternate}
+@keyframes logoGlow{to{filter:drop-shadow(0 0 16px #ff55aa)}}
+.play{position:relative;overflow:hidden}
+.play::before{
+ content:"";position:absolute;width:80px;height:180%;top:-40%;left:-120px;
+ background:linear-gradient(90deg,transparent,#fff9,transparent);transform:rotate(18deg);
+ animation:buttonShine 2.8s infinite;
+}
+@keyframes buttonShine{0%,55%{left:-120px}100%{left:130%}}
+.objective{position:relative;overflow:hidden}
+.objective::after{
+ content:"";position:absolute;inset:-100% 0;
+ background:linear-gradient(115deg,transparent 42%,#ff8fd522 50%,transparent 58%);
+ animation:cardSweep 3.5s linear infinite;
+}
+@keyframes cardSweep{to{transform:translateX(100%) translateY(40%)}}
+.bar i{background:linear-gradient(90deg,#ff4fa3,#ff75c8,#ffd166,#7cf7e6,#9d7cff,#ff4fa3);background-size:300% 100%;animation:rainbowBar 2s linear infinite}
+@keyframes rainbowBar{to{background-position:300% 0}}
+.target,.block,.toy,.star,.mem,.choice button{animation:softFloat 2.2s ease-in-out infinite}
+@keyframes softFloat{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.star{filter:drop-shadow(0 0 10px #ffd6f0) drop-shadow(0 0 18px #ff62b5)}
+.star::after{content:"✨"}
+.feedback{ text-shadow:0 0 14px currentColor,0 0 30px currentColor }
+
+
+#fx{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;background:#ff75c8;box-shadow:0 0 12px #ff75c8;animation:sparkFly var(--d) ease-out forwards}
+@keyframes sparkFly{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--x),var(--y)) rotate(360deg) scale(0);opacity:0}}
+.rainbow-ring{position:absolute;left:50%;top:50%;width:40px;height:40px;border-radius:50%;border:5px solid transparent;border-top-color:#ff4fa3;border-right-color:#ffd166;border-bottom-color:#7cf7e6;border-left-color:#9d7cff;transform:translate(-50%,-50%);animation:ringPop .7s ease-out forwards}
+@keyframes ringPop{to{width:330px;height:330px;opacity:0;transform:translate(-50%,-50%) rotate(180deg)}}
+
+</style>
+</head>
+<body>
+<div id="fx"></div><div id="app">
+<div class="screen" id="home">
+ <div class="home">
+  <div class="logo">60 SECONDS</div>
+  <div class="tag">One minute. Endless challenges.</div>
+  <button class="play" onclick="startGame()">▶ PLAY</button>
+  <div class="stats"><div class="stat"><b id="bestHome">0</b><span>Best Score</span></div><div class="stat"><b>60s</b><span>Time</span></div></div>
+  <div class="help">Every challenge is explained. Complete it → earn points → next challenge.</div>
+ </div>
+</div>
+
+<div class="screen hidden" id="game">
+ <div class="top">
+  <div class="scorebox"><div class="small">Score</div><div class="big" id="score">0</div></div>
+  <div class="timerbox"><div class="small">Time</div><div class="timer" id="timer">60</div></div>
+  <div class="combo"><div class="small">Combo</div><div class="big">x<span id="combo">1</span></div></div>
+ </div>
+ <div class="bar"><i id="timebar"></i></div>
+ <div class="objective"><div class="label">YOUR OBJECTIVE</div><h2 id="objective">Get ready!</h2><p id="hint">Complete the task below.</p></div>
+ <div id="board"></div>
+ <div class="footer">Challenge <b id="challengeNo">1</b> • Fast hands = higher score</div>
+ <div class="overlay hidden" id="pause"><div class="modal"><h2>PAUSED</h2><p>The clock is waiting.</p><button onclick="togglePause()">CONTINUE</button></div></div>
+</div>
+
+<div class="screen hidden" id="over">
+ <div class="home">
+  <div style="font-size:65px">⏱️</div>
+  <div class="logo" style="font-size:55px">TIME'S UP!</div>
+  <div class="tag">You survived the minute.</div>
+  <div class="stats">
+   <div class="stat"><b id="finalScore">0</b><span>Score</span></div>
+   <div class="stat"><b id="finalChallenges">0</b><span>Challenges</span></div>
+   <div class="stat"><b id="finalCombo">x1</b><span>Best Combo</span></div>
+  </div>
+  <p id="newBest" style="color:#ffd34d;font-weight:900;min-height:20px"></p>
+  <button class="play" onclick="startGame()">↻ PLAY AGAIN</button>
+  <button style="margin-top:12px;background:transparent;color:#9ca4c5" onclick="goHome()">HOME</button>
+ </div>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let score=0, combo=1, bestCombo=1, challenges=0, time=60, timer=null, paused=false, challengeTimer=null, current=null;
+let best=+localStorage.getItem("sixtyBest")||0;
+$("bestHome").textContent=best;
+
+const colors=[
+ {name:"GREEN",cls:"green"},{name:"RED",cls:"red"},{name:"BLUE",cls:"blue"},{name:"YELLOW",cls:"yellow"},{name:"PURPLE",cls:"purple"}
+];
+const toyIcons=["🧸","🪀","🚗","🪁","🤖","🎈","🧩","🦄"];
+let types=["color","stars","blocks","toy","tap","memory","choice","moving","rainbow"];
+
+function startGame(){
+ clearInterval(timer); clearTimeout(challengeTimer);
+ score=0;combo=1;bestCombo=1;challenges=0;time=60;paused=false;
+ $("home").classList.add("hidden");$("over").classList.add("hidden");$("game").classList.remove("hidden");
+ $("score").textContent=0;$("combo").textContent=1;$("timer").textContent=60;$("timer").classList.remove("danger");
+ burst(true); nextChallenge();
+ timer=setInterval(()=>{if(!paused){time--;updateTime();if(time<=0)endGame()}},1000);
+}
+function updateTime(){
+ $("timer").textContent=Math.max(0,time);
+ $("timebar").style.width=(time/60*100)+"%";
+ if(time<=10)$("timer").classList.add("danger");
+}
+
+function burst(pink=true){
+ const fx=$("fx"); const n=pink?24:12;
+ for(let i=0;i<n;i++){
+  const e=document.createElement("i"); e.className="spark";
+  e.style.left=(35+Math.random()*30)+"%"; e.style.top=(35+Math.random()*30)+"%";
+  e.style.setProperty("--x",(Math.random()*260-130)+"px");
+  e.style.setProperty("--y",(Math.random()*260-170)+"px");
+  e.style.setProperty("--d",(0.45+Math.random()*0.55)+"s");
+  if(!pink)e.style.background="#ffd166";
+  fx.appendChild(e); setTimeout(()=>e.remove(),1100);
+ }
+ const r=document.createElement("i");r.className="rainbow-ring";fx.appendChild(r);setTimeout(()=>r.remove(),750);
+}
+
+function addFeedback(txt,good=true){
+ const f=document.createElement("div");f.className="feedback";f.textContent=txt;f.style.color=good?"#6ff2b2":"#ff7284";$("board").appendChild(f);setTimeout(()=>f.remove(),600);
+}
+function reward(points){
+ const earned=points*combo;score+=earned;combo++;bestCombo=Math.max(bestCombo,combo); burst(true);
+ $("score").textContent=score;$("combo").textContent=combo;challenges++;
+ addFeedback("+"+earned+" ✨");
+ setTimeout(nextChallenge,250);
+}
+function fail(){
+ burst(false); combo=1;$("combo").textContent=1;addFeedback("MISS!",false);
+}
+function nextChallenge(){
+ if(time<=0)return;
+ clearTimeout(challengeTimer);
+ const phase=time>45?0:time>30?1:time>15?2:3;
+ const allowed=types.slice(0,Math.min(types.length,4+phase));
+ current=allowed[Math.floor(Math.random()*allowed.length)];
+ $("challengeNo").textContent=challenges+1;
+ render(current,phase);
+}
+function setText(title,hint){$("objective").textContent=title;$("hint").textContent=hint}
+function render(type,phase){
+ const b=$("board");b.innerHTML="";
+ if(type==="color"){
+  const target=colors[Math.floor(Math.random()*colors.length)];
+  setText("TAP "+target.name,"Tap the correct color. Wrong taps reset your combo.");
+  const wrap=document.createElement("div");wrap.className="targets";
+  [...colors].sort(()=>Math.random()-.5).forEach(c=>{let x=document.createElement("button");x.className="target "+c.cls;x.onclick=()=>c===target?reward(10):fail();wrap.appendChild(x)});b.appendChild(wrap);
+ }else if(type==="stars"){
+  let n=phase>=2?6:5,count=0;setText("COLLECT "+n+" STARS","Tap every ⭐ before they disappear.");
+  let area=document.createElement("div");area.className="stars";b.appendChild(area);
+  for(let i=0;i<n;i++){let s=document.createElement("button");s.className="star";s.textContent="⭐";s.style.left=(8+Math.random()*82)+"%";s.style.top=(8+Math.random()*78)+"%";s.onclick=()=>{if(!s.dataset.hit){s.dataset.hit=1;s.remove();count++;if(count===n)reward(15)}};area.appendChild(s)}
+ }else if(type==="blocks"){
+  const n=phase>=3?10:phase>=2?8:6;setText("BUILD "+n+" BLOCKS","Tap empty blocks until the grid is full.");
+  let g=document.createElement("div");g.className="blocks";let count=0;
+  for(let i=0;i<15;i++){let x=document.createElement("button");x.className="block";x.onclick=()=>{if(!x.classList.contains("on")){x.classList.add("on");count++;if(count===n)reward(12)}};g.appendChild(x)}
+  b.appendChild(g);
+ }else if(type==="toy"){
+  const wanted=toyIcons[Math.floor(Math.random()*toyIcons.length)];let found=false;
+  setText("FIND "+wanted,"Only one toy matches. Tap it!");
+  let area=document.createElement("div");area.className="toys";b.appendChild(area);
+  for(let i=0;i<12;i++){let x=document.createElement("button");x.className="toy";x.textContent=toyIcons[Math.floor(Math.random()*toyIcons.length)];x.style.left=(3+Math.random()*88)+"%";x.style.top=(3+Math.random()*83)+"%";x.onclick=()=>{if(x.textContent===wanted&&!found){found=true;reward(14)}else fail()};area.appendChild(x)}
+ }else if(type==="tap"){
+  let n=phase>=2?8:5,count=0;setText("HIT "+n+" TIMES","Tap the big target quickly.");let area=document.createElement("div");area.className="tapzone";let x=document.createElement("button");x.className="tapbtn";x.textContent="TAP!";x.onclick=()=>{count++;x.style.transform="scale(.92)";setTimeout(()=>x.style.transform="",60);if(count>=n)reward(10)};area.appendChild(x);b.appendChild(area);
+ }else if(type==="memory"){
+  const size=16, seq=[...Array(phase>=2?4:3)].map(()=>Math.floor(Math.random()*size));let showing=true;setText("REMEMBER "+seq.length,"Watch the highlighted squares, then repeat them.");
+  let g=document.createElement("div");g.className="memory";b.appendChild(g);let buttons=[];
+  for(let i=0;i<size;i++){let x=document.createElement("button");x.className="mem";x.dataset.i=i;x.onclick=()=>{if(showing)return;let expected=seq[buttons.filter(q=>q.dataset.done).length];if(+x.dataset.i===expected){x.dataset.done=1;x.classList.add("show");if(buttons.filter(q=>q.dataset.done).length===seq.length)reward(18)}else{fail();buttons.forEach(q=>q.dataset.done="");buttons.forEach(q=>q.classList.remove("show"))}};g.appendChild(x);buttons.push(x)}
+  seq.forEach(i=>buttons[i].classList.add("show"));setTimeout(()=>{showing=false;buttons.forEach(x=>x.classList.remove("show"))},900+seq.length*180);
+ }else if(type==="moving"){
+  const target=colors[Math.floor(Math.random()*colors.length)]; let hits=0; const needed=phase>=2?5:4;
+  setText("CHASE "+needed+" TARGETS","Tap the moving "+target.name+" targets before they jump away.");
+  let area=document.createElement("div");area.className="toys";b.appendChild(area);
+  for(let i=0;i<needed;i++){
+    let x=document.createElement("button");x.className="target "+target.cls;x.style.position="absolute";
+    x.style.left=(8+Math.random()*76)+"%";x.style.top=(8+Math.random()*72)+"%";
+    x.onclick=()=>{if(x.dataset.hit)return;x.dataset.hit=1;x.style.transform="scale(.1)";x.style.opacity=".2";hits++;burst(true);if(hits===needed)reward(17)};
+    area.appendChild(x);
+    setTimeout(()=>{if(!x.dataset.hit){x.style.left=(8+Math.random()*76)+"%";x.style.top=(8+Math.random()*72)+"%";}},350+i*90);
+  }
+ }else if(type==="rainbow"){
+  const seq=["🩷","💛","💚","🩵","💜"];let index=0;
+  setText("RAINBOW ORDER","Tap the colors from pink → yellow → green → blue → purple.");
+  let area=document.createElement("div");area.className="choice";b.appendChild(area);
+  [...seq].sort(()=>Math.random()-.5).forEach(a=>{let x=document.createElement("button");x.textContent=a;x.style.fontSize="32px";x.onclick=()=>{if(a===seq[index]){x.disabled=true;x.style.opacity=".35";index++;if(index===seq.length)reward(25)}else fail()};area.appendChild(x)});
+ }else{
+  const answers=["🍎","🍌","🍓","🍊"];const wanted=answers[Math.floor(Math.random()*answers.length)];
+  setText("TAP "+wanted,"Choose the matching item.");
+  let area=document.createElement("div");area.className="choice";answers.forEach(a=>{let x=document.createElement("button");x.textContent=a;x.onclick=()=>a===wanted?reward(9):fail();area.appendChild(x)});b.appendChild(area);
+ }
+}
+function endGame(){
+ for(let i=0;i<70;i++){setTimeout(()=>burst(true),i*12)}
+ clearInterval(timer);clearTimeout(challengeTimer);time=0;updateTime();
+ const isNew=score>best;if(isNew){best=score;localStorage.setItem("sixtyBest",best);$("bestHome").textContent=best}
+ $("finalScore").textContent=score;$("finalChallenges").textContent=challenges;$("finalCombo").textContent="x"+bestCombo;$("newBest").textContent=isNew?"🏆 NEW BEST SCORE!":"Best score: "+best;
+ $("game").classList.add("hidden");$("over").classList.remove("hidden");
+}
+function goHome(){$("over").classList.add("hidden");$("home").classList.remove("hidden");$("bestHome").textContent=best}
+function togglePause(){paused=!paused;$("pause").classList.toggle("hidden",!paused)}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("game").classList.contains("hidden")===false)togglePause()});
+window.addEventListener("error",e=>{
+  const b=document.getElementById("board");
+  if(b && !document.getElementById("game").classList.contains("hidden")){
+    b.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#ff9aaa;padding:25px"><div><b>Game error</b><br><small>Reload the page to restart.</small><br><button onclick="location.reload()" style="margin-top:12px;padding:10px 18px;border-radius:10px;background:#7c5cff;color:white">RELOAD</button></div></div>';
+  }
+});
+</script>
+</body>
+</html>
